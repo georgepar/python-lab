@@ -1,0 +1,72 @@
+#####################################################################################################
+# CONSTANTS #########################################################################################
+#####################################################################################################
+
+VAGRANTFILE_API_VERSION = "2"
+
+VM_NAME = "PATRECO_VM"
+VM_BASE = "ubuntu/xenial64"
+VM_MEMORY = 4096
+
+#####################################################################################################
+# INSTALL SYSTEM LEVEL DEPENDENCIES #################################################################
+#####################################################################################################
+
+$install_deps = <<SCRIPT
+apt-get install -y bzip2 curl git moreutils gawk sox tmux htop
+apt-get clean || exit 1;
+apt-get autoclean || exit 1;
+SCRIPT
+
+#####################################################################################################
+# INSTALL CONDA AND PYTHON DEPENDENCIES #############################################################
+#####################################################################################################
+
+$conda_installation = <<SCRIPT
+curl https://repo.continuum.io/miniconda/Miniconda3-4.3.27-Linux-x86_64.sh -o miniconda.sh || exit 1;
+bash miniconda.sh -b || exit 1;
+grep -q miniconda ~/.bashrc;
+if [[ ${?} -ne 0 ]]; then
+    echo "export PATH=\"${HOME}/miniconda3/bin:\${PATH}\"" >> ~/.bashrc
+fi
+
+export PATH=${HOME}/miniconda3/bin:${PATH}
+
+conda info || exit 1;
+rm miniconda.sh || exit 1;
+
+echo '' > ${HOME}/.bash_history
+history -c
+
+pip install numpy matplotlib jupyter
+pip install scikit-learn nltk librosa scipy gensim pandas scikit-image visdom tqdm
+pip install torch==0.4.1 torchvision --no-cache-dir
+python -m nltk.downloader popular
+
+SCRIPT
+
+
+#####################################################################################################
+# CONFIGURE AND PROVISION VM ########################################################################
+#####################################################################################################
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.provider "virtualbox" do |v|
+    v.name = VM_NAME
+    v.memory = VM_MEMORY
+  end
+
+  config.vm.box = VM_BASE
+  config.vm.network "forwarded_port", guest: 8888, host: 8888
+
+  config.trigger.after :up do |trigger|
+    trigger.run = {inline: 'vagrant ssh -c /vagrant/start_jupyter.bash'}
+  end
+
+  config.vm.provision "shell", inline: $install_deps, privileged: true
+  config.vm.provision "shell", inline: $conda_installation, privileged: false
+end
+
+#####################################################################################################
+# THE END ###########################################################################################
+#####################################################################################################
