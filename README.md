@@ -11,7 +11,7 @@ tutorial](http://cs231n.github.io/python-numpy-tutorial/) in cs231n course at St
 To ease the setup process we provide a virtual machine for each course with the required
 software preinstalled.
 
-To run the virtual machine you need to download and install [Vagrant](https://www.vagrantup.com/).
+To run the virtual machine you need to download and install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
 Then you need to open a terminal and run:
 
 ```
