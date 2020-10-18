@@ -32,7 +32,7 @@ vagrant up
 
 Setup will take a while, since it installs all dependencies.
 
-When the setup is finished, a jupyter notebook will start in the machine. Navigate to the 
+When the setup is finished, a jupyter notebook will start in the machine. Navigate to the
 URL printed.
 
 Changes to files will be saved automatically to your current working directory.
@@ -48,3 +48,21 @@ To stop the VM use
 ```
 vagrant halt
 ```
+
+
+## Bash tutorial
+
+To run the bash tutorial notebook first install the `bash_kernel` for jupyter notebook:
+
+```
+pip install bash_kernel
+python -m bash_kernel.install
+```
+
+and then run
+
+```
+jupyter notebook
+```
+
+and open `Bash Tutorial.ipynb`
